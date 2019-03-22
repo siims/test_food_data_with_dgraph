@@ -10,9 +10,9 @@ from models.Product import Nutrient, Amount, Product, Manufacturer, Ingredient
 CSV_FILE_RELATIVE_LOCATION = Path(__file__).parent.joinpath("../csv_data/usda_food_composition_database_2019_03_20")
 
 
-class Converter:
+class ProductParser:
 
-    def convert(self):
+    def parse(self):
         nutrients = self.get_nutrients()
         return self.get_products(nutrients)
 
@@ -26,7 +26,7 @@ class Converter:
         with open(CSV_FILE_RELATIVE_LOCATION.joinpath(product_csv_file_name)) as csvfile:
             rows = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(rows):
-                if i > 500:
+                if i > 250:
                     break
 
                 logging.debug(f"###{i}### Started processing product {row}")
@@ -51,7 +51,7 @@ class Converter:
         with open(CSV_FILE_RELATIVE_LOCATION.joinpath(nutrient_csv_file_name)) as csvfile:
             rows = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(rows):
-                if i > 5000:
+                if i > 100000:
                     break
                 nutrient = Nutrient(row[2], row[1], row[3])
                 amount = Amount(row[4], row[5])
@@ -86,7 +86,7 @@ class Converter:
             items = self._split_product_memo_to_items(preprocessed)
             return self._postprocess_product_memo(items)
         except Exception as e:
-            logging.error(f"Failed to convert ingredients '{text}'", e)
+            logging.error(f"Failed to parse ingredients '{text}'", e)
             logging.debug(traceback.format_exc())
             return []
 
@@ -197,5 +197,5 @@ class Converter:
 
 if __name__ == "__main__":
     logging.basicConfig(level="DEBUG")
-    products = Converter().convert()
+    products = ProductParser().parse()
     print(len(products))  # with nutrients: "45002000"
