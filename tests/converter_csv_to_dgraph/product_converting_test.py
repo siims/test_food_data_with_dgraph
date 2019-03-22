@@ -112,6 +112,7 @@ class ProductMemoDataDrivenTest(unittest.TestCase):
 
     @parameterized.expand([
         ("unclosed single bracket", "item 1 (some text, item 2", ["item 1", "some text", "item 2"]),
+        ("double comma", "item 1 ,, item 2", ["item 1", "item 2"]),
     ])
     @timeout_decorator.timeout(1)
     def test_all_cases(self, description, input, expected):

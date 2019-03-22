@@ -119,7 +119,7 @@ class Converter:
         return text.lower()
 
     def _split_product_memo_to_items(self, text):
-        return [item.strip() for item in text.split(",")]
+        return [self._format_ingredient(item) for item in text.split(",")]
 
     def _parse_datetime(self, text: str) -> Optional[datetime]:
         "Wed Nov 15 19:19:38 GMT 2017"
@@ -146,8 +146,8 @@ class Converter:
         items = self._ingredient_split_last_items_ending_with_keyword_other_than_comma(items)
         items = self._ingredient_remove_middle_captions(items)
         items = self._ingredient_remove_last_item_trailing_dot(items)
+        items = self._ingredient_remove_invalid(items)
         return list(map(lambda item: Ingredient(item), items))
-
 
     def _ingredient_split_last_items_ending_with_keyword_other_than_comma(self, items: List[str]) -> List[str]:
         for separator in [" and ", " & "]:
@@ -188,8 +188,14 @@ class Converter:
 
         return items
 
+    def _ingredient_remove_invalid(self, items):
+        return filter(lambda item: len(item) != 0, items)
+
+    def _format_ingredient(self, item):
+        return item.strip()
+
 
 if __name__ == "__main__":
     logging.basicConfig(level="DEBUG")
     products = Converter().convert()
-    print(len(products))
+    print(len(products))  # with nutrients: "45002000"
