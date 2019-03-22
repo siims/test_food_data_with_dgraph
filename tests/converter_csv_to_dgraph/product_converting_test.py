@@ -1,6 +1,9 @@
 import unittest
 from datetime import datetime
 
+from parameterized import parameterized
+from timeout_decorator import timeout_decorator
+
 from converter_csv_to_dgraph import converter
 from models.Product import Nutrient, Amount
 
@@ -103,3 +106,15 @@ class ProductMemoTest(unittest.TestCase):
         result = converter.Converter()._split_product_memo_to_items("item 1, item 2, item 3")
 
         self.assertEqual(["item 1", "item 2", "item 3"], result)
+
+
+class ProductMemoDataDrivenTest(unittest.TestCase):
+
+    @parameterized.expand([
+        ("unclosed single bracket", "item 1 (some text, item 2", ["item 1", "some text", "item 2"]),
+    ])
+    @timeout_decorator.timeout(1)
+    def test_all_cases(self, description, input, expected):
+        result = converter.Converter()._process_product_memo(input)
+
+        self.assertEqual(expected, list(map(lambda i: i.name, result)), description)

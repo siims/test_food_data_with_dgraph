@@ -98,6 +98,14 @@ class Converter:
         def remove_text_in_brackets(text):
             if text.find("(") == -1:
                 return text
+
+            def handle_unclosed_brackets(text):
+                if text.count("(") != text.count(")"):
+                    return text.replace("(", ",").replace(")", "")
+                return text
+
+            text = handle_unclosed_brackets(text)
+
             modified_memo = ""
             while text.find("(") != -1:
                 next_bracket_open = text.find("(")
