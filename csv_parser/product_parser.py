@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-from models.Product import Nutrient, Amount, Product, Manufacturer, Ingredient
+from models.ProductModels import Nutrient, Amount, Product, Manufacturer, Ingredient
 
 CSV_FILE_RELATIVE_LOCATION = Path(__file__).parent.joinpath("../csv_data/usda_food_composition_database_2019_03_20")
 
@@ -26,7 +26,9 @@ class ProductParser:
         with open(CSV_FILE_RELATIVE_LOCATION.joinpath(product_csv_file_name)) as csvfile:
             rows = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(rows):
-                if i > 250:
+                if i < 240:
+                    continue
+                if i > 245:
                     break
 
                 logging.debug(f"###{i}### Started processing product {row}")

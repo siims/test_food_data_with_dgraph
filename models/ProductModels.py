@@ -4,22 +4,26 @@ from typing import List, Dict
 
 
 @dataclass
-class DataSource:
+class InformationSource:
+    label = "information_source"
     abbrivation: str
 
 
 @dataclass
 class Manufacturer:
+    label = "company"
     name: str
 
 
 @dataclass
 class Ingredient:
+    label = "ingredient"
     name: str
 
 
 @dataclass(eq=True, frozen=True)
 class Nutrient:
+    label = "nutrient"
     name: str
     code: str
     derivation_code: str
@@ -27,17 +31,19 @@ class Nutrient:
 
 @dataclass
 class Amount:
+    label = "amount"
     scalar: str
     unit: str
 
 
 @dataclass
 class Product:
+    label = "product"
     usda_food_db_id: str
     name: str
-    data_source: DataSource
+    information_source: InformationSource
     barcode: str
-    manufacturer: Manufacturer
+    manufactured_by: Manufacturer
     date_modified: datetime
     date_available: datetime
     ingredients: List[Ingredient]

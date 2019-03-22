@@ -5,7 +5,7 @@ from parameterized import parameterized
 from timeout_decorator import timeout_decorator
 
 from csv_parser.product_parser import ProductParser
-from models.Product import Nutrient, Amount
+from models.ProductModels import Nutrient, Amount
 
 
 class ProductParserTest(unittest.TestCase):
