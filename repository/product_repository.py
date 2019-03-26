@@ -1,10 +1,9 @@
 import json
-from datetime import datetime
 from typing import Optional
 
 import pydgraph
 
-from models.ProductModels import Product
+from models.ProductModels import FoodProduct, Manufacturer, InformationSource
 
 
 class DataSource:
@@ -20,14 +19,15 @@ class ProductRepository:
         super().__init__()
         self.db = data_source.client
 
-    def addProduct(self, product: Product) -> Optional[Product]:
+    def addProduct(self, product: FoodProduct) -> Optional[FoodProduct]:
         txn = self.db.txn()
         try:
-            self._addMissingInformationSources(txn, product.information_source)
+            self._addMissingInformationSources(txn, product.source)
             self._addMissingManufacturers(txn, product.manufactured_by)
             self._addMissingIngredients(txn, product.ingredients)
             product_dict = product.__dict__
             product_dict["label"] = "product"
+            product_dict["uid"] = product_dict["uid"]
             product_dict.pop("information_source")
             product_dict["manufactured_by"] = product_dict["manufactured_by"].__dict__
             product_dict["manufactured_by"]["label"] = "company"
@@ -50,6 +50,34 @@ class ProductRepository:
 
     def _addMissingIngredients(self, txn, ingredients):
         pass
+
+    def addProducts(self, products):
+        txn = self.db.txn()
+        try:
+            product_dicts = []
+            for id, product in products.items():
+                product_dict = product.__dict__
+                product_dict["label"] = "product"
+                product_dict["uid"] = product_dict["uid"]
+                product_information_source = product_dict.pop("information_source")
+                product_manufacturer = product_dict["manufactured_by"]
+                product_ingredients = product_dict.pop("ingredients")
+                product_nutrients = product_dict.pop("nutrients")
+                product_dict["date_modified"] = product_dict["date_modified"].isoformat()
+                product_dict["date_available"] = product_dict["date_available"].isoformat()
+
+                product_dict["manufactured_by"] = product_manufacturer.__dict__
+                product_dict["manufactured_by"]["label"] = Manufacturer.label
+
+                product_dict["source"] = product_information_source.__dict__
+                product_dict["source"]["label"] = InformationSource.label
+
+                product_dicts.append(product_dict)
+            txn.mutate(set_obj=product_dicts)
+            txn.commit()
+            return None
+        finally:
+            txn.discard()
 
 
 if __name__ == "__main__":

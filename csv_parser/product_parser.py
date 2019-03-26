@@ -1,13 +1,20 @@
 import csv
 import logging
+import random
 import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-from models.ProductModels import Nutrient, Amount, Product, Manufacturer, Ingredient
+from models.ProductModels import Nutrient, Amount, FoodProduct, Manufacturer, Ingredient, InformationSource
 
 CSV_FILE_RELATIVE_LOCATION = Path(__file__).parent.joinpath("../csv_data/usda_food_composition_database_2019_03_20")
+
+random.seed(0)
+
+
+def uid(identifier: str) -> str:
+    return f"_:{identifier}"
 
 
 class ProductParser:
@@ -18,7 +25,7 @@ class ProductParser:
 
     def get_products(
             self, nutrients: Tuple[List[Nutrient], Dict[str, List[Tuple[Nutrient, Amount]]]]
-    ) -> Dict[str, Product]:
+    ) -> Dict[str, FoodProduct]:
         product_csv_file_name = "Products.csv"
 
         all_nutrients, products_nutrients = nutrients
@@ -34,10 +41,13 @@ class ProductParser:
                 logging.debug(f"###{i}### Started processing product {row}")
 
                 product_usda_food_db_id = row[0]
+                barcode = row[3]
                 nutrient_amounts = self._calculate_product_nutrient_amounts(product_usda_food_db_id, products_nutrients)
                 product_ingredients = self._process_product_memo(row[7])
-                product = Product(
-                    product_usda_food_db_id, row[1], row[2], row[3], Manufacturer(row[4]),
+                product = FoodProduct(
+                    uid(barcode),
+                    product_usda_food_db_id, row[1], InformationSource(uid(f"source_{row[2]}"), row[2]), barcode,
+                    Manufacturer(uid(f"manufacturer_{row[4]}"), row[4]),
                     self._parse_datetime(row[5]), self._parse_datetime(row[6]),
                     product_ingredients, nutrient_amounts)
                 products[product_usda_food_db_id] = product
@@ -53,10 +63,11 @@ class ProductParser:
         with open(CSV_FILE_RELATIVE_LOCATION.joinpath(nutrient_csv_file_name)) as csvfile:
             rows = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(rows):
-                if i > 100000:
+                if i > 00:
                     break
-                nutrient = Nutrient(row[2], row[1], row[3])
-                amount = Amount(row[4], row[5])
+                name = row[2]
+                nutrient = Nutrient(uid(f"nutrient_{name}"), name, row[1], row[3])
+                amount = Amount(uid(f"amount_{row[4]}_{row[5]}"), row[4], row[5])
 
                 nutrients.add(nutrient)
                 if nutrient_amounts.get(row[0], None) is None:
@@ -149,7 +160,7 @@ class ProductParser:
         items = self._ingredient_remove_middle_captions(items)
         items = self._ingredient_remove_last_item_trailing_dot(items)
         items = self._ingredient_remove_invalid(items)
-        return list(map(lambda item: Ingredient(item), items))
+        return list(map(lambda item: Ingredient(uid(f"ingredient_{item}"), item), items))
 
     def _ingredient_split_last_items_ending_with_keyword_other_than_comma(self, items: List[str]) -> List[str]:
         for separator in [" and ", " & "]:

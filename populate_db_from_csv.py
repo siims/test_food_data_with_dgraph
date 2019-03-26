@@ -6,6 +6,5 @@ from repository.product_repository import DataSource, ProductRepository
 if __name__ == "__main__":
     products = ProductParser().parse()
     repo = ProductRepository(DataSource())
-    for id, product in products.items():
-        repo.addProduct(product)
+    repo.addProducts(products)
     logging.info(f"Finished adding #{len(products)} products")
