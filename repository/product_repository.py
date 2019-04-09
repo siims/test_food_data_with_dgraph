@@ -3,7 +3,7 @@ from typing import Optional
 
 import pydgraph
 
-from models.ProductModels import FoodProduct, Manufacturer, InformationSource
+from models.product_models import FoodProduct, Manufacturer, InformationSource
 
 
 class DataSource:
@@ -13,6 +13,8 @@ class DataSource:
         self.client = pydgraph.DgraphClient(client_stub)
 
 
+# TODO: highly experimental
+# TODO: object serialization needed
 class ProductRepository:
 
     def __init__(self, data_source: DataSource) -> None:

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Dict
 
-from utils.JSONEncoderEnhancedWithDateSerialization import JSONEncoderEnhancedWithDateSerialization
+from utils.json_encoder import JSONEncoderEnhancedWithDateSerialization
 from utils.utils import with_label
 
 

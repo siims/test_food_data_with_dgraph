@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-from models.ProductModels import Nutrient, Amount, FoodProduct, Manufacturer, Ingredient, InformationSource
+from models.product_models import Nutrient, Amount, FoodProduct, Manufacturer, Ingredient, InformationSource
 
 CSV_FILE_RELATIVE_LOCATION = Path(__file__).parent.joinpath("../csv_data/usda_food_composition_database_2019_03_20")
 
