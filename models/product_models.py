@@ -29,12 +29,15 @@ class Ingredient:
 
 
 @with_label("nutrient")
-@dataclass(eq=True, frozen=True)
+@dataclass(eq=True)
 class Nutrient:
     uid: str
     name: str
     code: str
     derivation_code: str
+
+    def __hash__(self) -> int:
+        return hash((self.name, self.code, self.derivation_code))
 
 
 @with_label("amount")

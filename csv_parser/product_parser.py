@@ -19,9 +19,9 @@ def uid(identifier: str) -> str:
 
 class ProductParser:
 
-    def parse(self):
+    def parse(self) -> [FoodProduct]:
         nutrients = self.get_nutrients()
-        return self.get_products(nutrients)
+        return self.get_products(nutrients).values()
 
     def get_products(
             self, nutrients: Tuple[List[Nutrient], Dict[str, List[Tuple[Nutrient, Amount]]]]
@@ -33,9 +33,9 @@ class ProductParser:
         with open(CSV_FILE_RELATIVE_LOCATION.joinpath(product_csv_file_name)) as csvfile:
             rows = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(rows):
-                if i < 240:
+                if i < 0:
                     continue
-                if i > 245:
+                if i > 10245:
                     break
 
                 logging.debug(f"###{i}### Started processing product {row}")
@@ -44,10 +44,11 @@ class ProductParser:
                 barcode = row[3]
                 nutrient_amounts = self._calculate_product_nutrient_amounts(product_usda_food_db_id, products_nutrients)
                 product_ingredients = self._process_product_memo(row[7])
+                manufacturer_name = row[4]
                 product = FoodProduct(
                     uid(barcode),
                     product_usda_food_db_id, row[1], InformationSource(uid(f"source_{row[2]}"), row[2]), barcode,
-                    Manufacturer(uid(f"manufacturer_{row[4]}"), row[4]),
+                    Manufacturer(uid(f"manufacturer_{ manufacturer_name }"), manufacturer_name),
                     self._parse_datetime(row[5]), self._parse_datetime(row[6]),
                     product_ingredients, nutrient_amounts)
                 products[product_usda_food_db_id] = product
