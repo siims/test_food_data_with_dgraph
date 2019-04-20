@@ -161,6 +161,7 @@ class ProductParser:
         items = self._ingredient_remove_middle_captions(items)
         items = self._ingredient_remove_last_item_trailing_dot(items)
         items = self._ingredient_remove_invalid(items)
+        items = self._ingredient_remove_empty_strings(items)
         return list(map(lambda item: Ingredient(uid(f"ingredient_{item}"), item), items))
 
     def _ingredient_split_last_items_ending_with_keyword_other_than_comma(self, items: List[str]) -> List[str]:
@@ -207,6 +208,9 @@ class ProductParser:
 
     def _format_ingredient(self, item):
         return item.strip()
+
+    def _ingredient_remove_empty_strings(self, items):
+        return list(filter(lambda x: x != "", items))
 
 
 if __name__ == "__main__":

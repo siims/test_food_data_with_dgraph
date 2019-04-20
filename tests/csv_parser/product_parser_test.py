@@ -18,23 +18,23 @@ class ProductParserTest(unittest.TestCase):
         self.assertEquals(datetime(2017, 11, 15, 19, 19, 38), result)
 
     def test_calculate_product_nutrients(self):
-        nutrient_1 = Nutrient(name='Protein', code='203', derivation_code='LCGA')
-        nutrient_2 = Nutrient(name='Total lipid (fat)', code='204', derivation_code='LCGA')
-        nutrient_3 = Nutrient(name='Carbohydrate', code='205', derivation_code='LCGA')
+        nutrient_1 = Nutrient("1", name='Protein', code='203', derivation_code='LCGA')
+        nutrient_2 = Nutrient("2", name='Total lipid (fat)', code='204', derivation_code='LCGA')
+        nutrient_3 = Nutrient("3", name='Carbohydrate', code='205', derivation_code='LCGA')
 
         product_id = '45128680'
         product_nutrient_amount = {product_id: [
-            (nutrient_1, Amount(scalar='12.7', unit='g')),
-            (nutrient_2, Amount(scalar='8.3', unit='g')),
-            (nutrient_3, Amount(scalar='24.6', unit='g'))
+            (nutrient_1, Amount("4", scalar='12.7', unit='g')),
+            (nutrient_2, Amount("5", scalar='8.3', unit='g')),
+            (nutrient_3, Amount("6", scalar='24.6', unit='g'))
         ]}
 
         result = ProductParser()._calculate_product_nutrient_amounts(product_id, product_nutrient_amount)
 
         self.assertEqual(3, len(result))
-        self.assertEqual(Amount(scalar='12.7', unit='g'), result[nutrient_1])
-        self.assertEqual(Amount(scalar='8.3', unit='g'), result[nutrient_2])
-        self.assertEqual(Amount(scalar='24.6', unit='g'), result[nutrient_3])
+        self.assertEqual(Amount("4", scalar='12.7', unit='g'), result[nutrient_1])
+        self.assertEqual(Amount("5", scalar='8.3', unit='g'), result[nutrient_2])
+        self.assertEqual(Amount("6", scalar='24.6', unit='g'), result[nutrient_3])
 
 
 class ProductMemoTest(unittest.TestCase):
@@ -97,6 +97,11 @@ class ProductMemoTest(unittest.TestCase):
         result = ProductParser()._split_product_memo_to_items("item 1, item 2, item 3")
 
         self.assertEqual(["item 1", "item 2", "item 3"], result)
+
+    def test_empty_items_get_removed(self):
+        result = ProductParser()._ingredient_remove_empty_strings(["item 1", "", "item 3"])
+
+        self.assertEqual(["item 1", "item 3"], result)
 
 
 class ProductMemoDataDrivenTest(unittest.TestCase):
