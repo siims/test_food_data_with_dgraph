@@ -130,6 +130,7 @@ class ProductParser:
 
         text = remove_stars(text)
         text = remove_text_in_brackets(text)
+        text = text.rstrip(",")
         return text.lower()
 
     def _split_product_memo_to_items(self, text):
